@@ -38,5 +38,5 @@ Add screenshots of your final version here before submitting. Capture the home p
 - Change the sample student and course information in `src/data.js`.
 - Add screenshots of your finished website.
 - Add your GitHub repository and deployment links to your report.
-- Write the group contribution statement using the actual names and work completed.
+- This is an individual project, so no group contribution statement is needed.
 - Check your instructor's policy on AI assistance and disclose assistance if required.
