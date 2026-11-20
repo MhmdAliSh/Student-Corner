@@ -1,31 +1,199 @@
-import React, { useState } from 'react';
-import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
-import { Home, BookOpen, GraduationCap, CalendarDays, UserRound, CircleHelp, Settings, Search, Bell, ChevronDown, Menu, X, ArrowUpRight, ArrowRight, Clock3, MapPin, MoreHorizontal, Plus, Check, Sparkles, Code2, Database, Calculator, Palette, LayoutDashboard, Mail, Phone, Github, ExternalLink } from 'lucide-react';
-import { student, courses, assignments, activities } from './data.js';
+import { useState } from 'react';
+import { Link, NavLink, Route, Routes, useParams } from 'react-router-dom';
+import { courses, student } from './data.js';
 
-const iconMap = { code: Code2, database: Database, calculator: Calculator, palette: Palette };
-const menu = [
-  { label: 'ACADEMIC', items: [{ to: '/', label: 'Dashboard', icon: Home }, { to: '/courses', label: 'My courses', icon: BookOpen, badge: '4' }, { to: '/grades', label: 'Grades', icon: GraduationCap }, { to: '/schedule', label: 'Schedule', icon: CalendarDays }] },
-  { label: 'ACCOUNT', items: [{ to: '/profile', label: 'My profile', icon: UserRound }] },
+const pages = [
+  ['Home', '/'],
+  ['About', '/about'],
+  ['Features', '/features'],
+  ['Courses', '/courses'],
+  ['Contact', '/contact'],
 ];
 
 function App() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const location = useLocation();
-  const pageTitle = ({ '/': 'Dashboard', '/courses': 'My courses', '/grades': 'Grades', '/schedule': 'Schedule', '/profile': 'My profile', '/about': 'About Campusly', '/features': 'Features', '/contact': 'Contact' })[location.pathname] || 'Dashboard';
-  const nav = <><div className="brand"><span className="brand-mark"><GraduationCap size={22} /></span><span>campusly<span className="brand-dot">.</span></span></div><div className="nav-label">NAVIGATION</div>{menu.map(group=><div className="nav-group" key={group.label}><div className="nav-label">{group.label}</div>{group.items.map(item=><NavLink onClick={()=>setMobileOpen(false)} to={item.to} key={item.to} className={({isActive})=>`nav-item ${isActive?'active':''}`}><item.icon size={18}/><span>{item.label}</span>{item.badge&&<span className="nav-badge">{item.badge}</span>}</NavLink>)}</div>)}<div className="nav-group"><div className="nav-label">PROJECT</div><NavLink onClick={()=>setMobileOpen(false)} to="/features" className={({isActive})=>`nav-item ${isActive?'active':''}`}><Sparkles size={18}/><span>Features</span></NavLink><NavLink onClick={()=>setMobileOpen(false)} to="/about" className={({isActive})=>`nav-item ${isActive?'active':''}`}><CircleHelp size={18}/><span>About portal</span></NavLink><NavLink onClick={()=>setMobileOpen(false)} to="/contact" className={({isActive})=>`nav-item ${isActive?'active':''}`}><Mail size={18}/><span>Contact</span></NavLink></div><div className="sidebar-bottom"><div className="project-note"><strong>Project demo</strong><p>Student and course records are sample data.</p></div><div className="student-mini"><span className="avatar">{student.avatar}</span><div><strong>{student.name}</strong><small>{student.major}</small></div><MoreHorizontal size={18} className="muted"/></div></div></>;
-  return <div className="app-shell"><aside className={`sidebar ${mobileOpen?'open':''}`}>{nav}</aside>{mobileOpen&&<button className="mobile-scrim" onClick={()=>setMobileOpen(false)} aria-label="Close menu"/>}<main className="main"><header className="topbar"><button className="mobile-menu" onClick={()=>setMobileOpen(!mobileOpen)} aria-label="Toggle navigation">{mobileOpen?<X/>:<Menu/>}</button><div className="crumb">Student portal <span>/</span> <strong>{pageTitle}</strong></div><div className="top-actions"><NavLink className="account-button" to="/profile"><span className="avatar avatar-small">{student.avatar}</span><span className="account-name">{student.name}</span></NavLink></div></header><div className="page-wrap"><Routes><Route path="/" element={<Dashboard/>}/><Route path="/courses" element={<Courses/>}/><Route path="/grades" element={<Grades/>}/><Route path="/schedule" element={<Schedule/>}/><Route path="/profile" element={<Profile/>}/><Route path="/about" element={<About/>}/><Route path="/features" element={<Features/>}/><Route path="/contact" element={<Contact/>}/><Route path="*" element={<Dashboard/>}/></Routes><footer className="footer"><span>© 2026 Campusly Student Portal</span><span>CSCI426 student project</span></footer></div></main></div>;
+  return (
+    <div className="site">
+      <header className="header">
+        <Link className="logo" to="/">Student Corner</Link>
+        <nav aria-label="Main navigation">
+          {pages.map(([label, path]) => (
+            <NavLink key={path} to={path} end={path === '/'}>
+              {label}
+            </NavLink>
+          ))}
+        </nav>
+      </header>
+
+      <main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/features" element={<Features />} />
+          <Route path="/courses" element={<Courses />} />
+          <Route path="/courses/:courseId" element={<CourseDetails />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<Home />} />
+        </Routes>
+      </main>
+
+      <footer>Student Corner | CSCI426 project</footer>
+    </div>
+  );
 }
 
-function PageHeading({eyebrow,title,subtitle,action}) { return <div className="page-heading"><div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1><p>{subtitle}</p></div>{action}</div>; }
-function Dashboard(){const [done,setDone]=useState({});return <><PageHeading eyebrow="MONDAY, NOVEMBER 16, 2026" title={<>Good morning, {student.firstName}</>} subtitle="Two classes scheduled today."/><div className="semester-strip"><span>FALL 2026</span><span className="strip-dot">·</span><span>WEEK 11</span><NavLink to="/schedule">View schedule <ArrowRight size={14}/></NavLink></div><section className="stats-grid"><StatCard label="ENROLLED COURSES" value="04" note="This semester" icon={BookOpen} color="lilac"/><StatCard label="CREDITS EARNED" value="13" note="of 15 total credits" icon={GraduationCap} color="peach"/><StatCard label="ATTENDANCE" value="94%" note="Looking great!" icon={CalendarDays} color="mint"/><StatCard label="ASSIGNMENTS DUE" value="02" note="Next 7 days" icon={Clock3} color="sky"/></section><div className="dashboard-grid"><section className="panel courses-panel"><div className="panel-heading"><div><h3>My courses</h3><p>Courses you're taking this semester.</p></div><NavLink className="text-link" to="/courses">View all <ArrowRight size={15}/></NavLink></div><div className="course-list">{courses.slice(0,3).map(c=><CourseRow key={c.id} course={c}/>)}</div></section><section className="panel today-panel"><div className="panel-heading"><div><h3>Today's schedule</h3><p>Monday, November 16</p></div></div><div className="schedule-list"><div className="schedule-item"><span className="time">10:00</span><span className="timeline-dot violet-dot"/><div><strong>Advanced Web Programming</strong><small><MapPin size={12}/> Tech Hall · 204</small></div></div><div className="schedule-item"><span className="time">13:30</span><span className="timeline-dot blue-dot"/><div><strong>Database Systems</strong><small><MapPin size={12}/> Science Center · 118</small></div></div></div><div className="schedule-footer"><Clock3 size={14}/> 2 classes scheduled <NavLink to="/schedule">Full schedule</NavLink></div></section></div><div className="dashboard-grid lower-grid"><section className="panel task-panel"><div className="panel-heading"><div><h3>Assignments <span className="count-pill">{assignments.length-Object.values(done).filter(Boolean).length}</span></h3><p>Upcoming course work.</p></div></div><div className="tasks">{assignments.map((a,i)=><div className={`task-row ${done[i]?'is-done':''}`} key={a.title}><button className={`task-check ${done[i]?'checked':''}`} onClick={()=>setDone({...done,[i]:!done[i]})} aria-label={`Mark ${a.title} ${done[i]?'incomplete':'complete'}`}>{done[i]&&<Check size={13}/>}</button><div className={`task-color ${a.color}`}/><div className="task-info"><strong>{a.title}</strong><small>{a.course}</small></div><span className={`task-due ${i===0?'due-soon':''}`}>{a.due}</span></div>)}</div></section><section className="panel activity-panel"><div className="panel-heading"><div><h3>Recent updates</h3><p>Latest course activity.</p></div></div><div className="activity-list">{activities.map(a=><div className="activity-row" key={a.title}><span className={`activity-icon ${a.color}`}><Check size={15}/></span><div><strong>{a.title}</strong><small>{a.detail}</small></div><time>{a.time}</time></div>)}</div></section></div></>}function StatCard({label,value,note,icon:Icon,color}){return <article className="stat-card"><div className="stat-top"><span className="stat-label">{label}</span><span className={`stat-icon ${color}`}><Icon size={17}/></span></div><div className="stat-value">{value}</div><div className="stat-note">{note}</div></article>}
-function CourseRow({course}){const Icon=iconMap[course.icon]||BookOpen;return <NavLink to="/courses" className="course-row"><span className={`course-icon ${course.color}`}><Icon size={19}/></span><div className="course-main"><strong>{course.title}</strong><small>{course.id} <span>·</span> {course.instructor}</small></div><div className="course-progress"><div className="progress-track"><i style={{width:`${course.progress}%`}}/></div><small>{course.progress}% complete</small></div><span className="course-grade">{course.grade}</span><ArrowUpRight size={15} className="row-arrow"/></NavLink>}
-function Courses(){return <><PageHeading eyebrow="YOUR LEARNING SPACE" title="My courses" subtitle="Everything you're learning this semester, in one place." action={<NavLink className="button button-light" to="/contact">Ask about courses</NavLink>}/><div className="course-overview"><div><strong>4</strong><span>Active courses</span></div><div><strong>13</strong><span>Credits enrolled</span></div><div><strong>3.72</strong><span>Current GPA</span></div><div><strong>69%</strong><span>Average progress</span></div></div><div className="course-cards">{courses.map(c=>{const Icon=iconMap[c.icon];return <article className="course-card" key={c.id}><div className="course-card-top"><span className={`course-icon ${c.color}`}><Icon size={20}/></span><span className="course-code">{c.id}</span><button className="more-button"><MoreHorizontal size={19}/></button></div><h3>{c.title}</h3><p>{c.instructor} · {c.credits} credits</p><div className="course-card-meta"><span><Clock3 size={14}/>{c.next}</span><span><MapPin size={14}/>{c.room}</span></div><div className="course-card-progress"><div><small>Course progress</small><strong>{c.progress}%</strong></div><div className="progress-track"><i style={{width:`${c.progress}%`}}/></div></div><div className="course-card-bottom"><span>Current grade</span><b>{c.grade}</b><NavLink to="/grades">View details <ArrowRight size={13}/></NavLink></div></article>})}</div></>}
-function Grades(){return <><PageHeading eyebrow="ACADEMIC PERFORMANCE" title="Grades & progress" subtitle="A clear picture of how your hard work is paying off."/><section className="grade-summary"><div><span className="stat-label">CUMULATIVE GPA</span><strong>3.72<span> / 4.00</span></strong><p><span>↗ 0.18</span> compared with last semester</p></div><div className="gpa-bars">{['Fall 24','Spring 25','Fall 25'].map((x,i)=><div key={x}><span style={{height:[48,68,84][i]+'%'}}/><small>{x}</small></div>)}</div></section><section className="panel grade-table-panel"><div className="panel-heading"><div><h3>Current semester</h3><p>Fall semester · 2026–2027</p></div><span className="status-chip"><span/> In progress</span></div><div className="grade-table"><div className="grade-head"><span>COURSE</span><span>COURSEWORK</span><span>CREDITS</span><span>GRADE</span></div>{courses.map(c=><div className="grade-line" key={c.id}><div><strong>{c.title}</strong><small>{c.id} · {c.instructor}</small></div><div className="grade-score"><strong>{c.score}%</strong><div className="progress-track"><i style={{width:`${c.score}%`}}/></div></div><span>{c.credits}</span><b className={`grade-letter ${c.grade.startsWith('A')?'high':''}`}>{c.grade}</b></div>)}</div><div className="grade-footnote">Grades shown are current estimates and may change as new work is assessed.</div></section></>}
-function Schedule(){const days=[['MON','16'],['TUE','17'],['WED','18'],['THU','19'],['FRI','20']];return <><PageHeading eyebrow="WEEK OF NOVEMBER 16" title="Your schedule" subtitle="A little planning makes room for great things." /><div className="panel calendar-panel"><div className="calendar-heading"><h3>November 16 - 20, 2026</h3></div><div className="week-grid"><div className="week-days"><span/> {days.map((d,i)=><div className={i===0?'current-day':''} key={d[0]}><small>{d[0]}</small><b>{d[1]}</b></div>)}</div>{['9 AM','10 AM','11 AM','12 PM','1 PM','2 PM','3 PM'].map((t,i)=><div className="week-row" key={t}><small>{t}</small>{days.map((d,j)=><div key={d[0]}>{(i===1&&j===0)&&<div className="cal-event violet-event"><b>Advanced Web Programming</b><span>10:00 – 11:15 AM</span></div>}{(i===4&&j===0)&&<div className="cal-event blue-event"><b>Database Systems</b><span>1:30 – 2:45 PM</span></div>}{(i===2&&j===2)&&<div className="cal-event orange-event"><b>Discrete Mathematics</b><span>11:00 AM – 12:15 PM</span></div>}{(i===3&&j===3)&&<div className="cal-event pink-event"><b>Human-Computer Interaction</b><span>12:00 – 1:15 PM</span></div>}</div>)}</div>)}</div></div><p className="schedule-note"><Clock3 size={15}/> All class times are shown in your local time zone.</p></>}
-function Profile(){return <><PageHeading eyebrow="YOUR CAMPUS IDENTITY" title="My profile" subtitle="Your student details and academic information." /><section className="profile-cover"><div className="profile-avatar">{student.avatar}</div><div><h2>{student.name}</h2><p>{student.major} · {student.year} year</p></div><span className="profile-status"><span/> Active student</span></section><div className="profile-grid"><section className="panel profile-panel"><h3>Personal information</h3><div className="info-row"><span>Full name</span><strong>{student.name}</strong></div><div className="info-row"><span>Student ID</span><strong>{student.id}</strong></div><div className="info-row"><span>Email address</span><strong>{student.email}</strong></div><div className="info-row"><span>Major</span><strong>{student.major}</strong></div><div className="info-row"><span>Academic year</span><strong>{student.year}</strong></div></section><section className="panel profile-panel"><h3>Academic snapshot</h3><div className="profile-gpa"><span className="stat-icon lilac"><GraduationCap size={18}/></span><div><small>CUMULATIVE GPA</small><strong>3.72 <span>/ 4.00</span></strong></div></div><div className="info-row"><span>Current semester</span><strong>Fall 2026</strong></div><div className="info-row"><span>Enrolled courses</span><strong>4 courses</strong></div><div className="info-row"><span>Credits this term</span><strong>13 credits</strong></div></section></div></>}
-function About(){return <><PageHeading eyebrow="MADE FOR CAMPUS LIFE" title="About this project" subtitle="Campusly brings the details of student life together, so you can focus on what matters."/><section className="about-hero"><div className="about-emblem"><GraduationCap size={42}/></div><p>University life has enough moving parts. Campusly is a student-first space that helps make courses, grades, and the weekly rhythm easier to see and manage.</p></section><div className="about-columns"><article className="panel about-panel"><span className="stat-icon lilac"><LayoutDashboard size={18}/></span><h3>One clear view</h3><p>See the information you need without jumping between places. Your dashboard gives the week a calmer starting point.</p></article><article className="panel about-panel"><span className="stat-icon mint"><Sparkles size={18}/></span><h3>Built around students</h3><p>Readable, responsive screens make the portal comfortable to use between classes, at home, or on the go.</p></article><article className="panel about-panel"><span className="stat-icon peach"><GraduationCap size={18}/></span><h3>Progress that feels real</h3><p>Keep track of course progress, assignment deadlines, and grades as your semester unfolds.</p></article></div><p className="demo-disclaimer">Campusly is a university project prototype. The student records shown are fictional sample data.</p></>}
-function Features(){return <><PageHeading eyebrow="PORTAL FEATURES" title="Features" subtitle="The portal keeps course information and key student details together."/><div className="feature-list">{[[BookOpen,'Course list','See your active classes, instructors, progress, and next meeting at a glance.','violet'],[GraduationCap,'Grade summary','Follow course scores alongside your cumulative GPA and semester progress.','blue'],[CalendarDays,'Weekly schedule','Keep your classes visible in a clean weekly schedule.','orange'],[Check,'Assignment checklist','Keep assignment deadlines close and mark work off as you finish.','pink']].map(([Icon,title,desc,color])=><article className="feature-row" key={title}><span className={`course-icon ${color}`}><Icon size={21}/></span><div><h3>{title}</h3><p>{desc}</p></div><ArrowUpRight size={17}/></article>)}</div><div className="feature-cta"><div><span className="eyebrow">QUICK LINK</span><h3>Return to the student dashboard.</h3></div><NavLink className="button button-primary" to="/">Go to dashboard <ArrowRight size={15}/></NavLink></div></>}
-function Contact(){const [sent,setSent]=useState(false);return <><PageHeading eyebrow="STUDENT SUPPORT" title="Contact support" subtitle="Use the form to record a portal support request (demo only)."/><div className="contact-grid"><section className="panel contact-info"><span className="stat-icon lilac"><CircleHelp size={19}/></span><h3>Student support</h3><p>These sample contact details are for the project demonstration.</p><div className="contact-detail"><Mail size={16}/><span>support@campusly.edu</span></div><div className="contact-detail"><Phone size={16}/><span>+961 1 555 014</span></div><div className="contact-hours">Monday – Friday<br/>8:30 AM – 4:30 PM</div></section><form className="panel contact-form" onSubmit={e=>{e.preventDefault();setSent(true)}}><h3>Send us a message</h3><p>This form shows a confirmation in the browser. It does not send email.</p><label>Your name<input required defaultValue={student.name}/></label><label>Email address<input type="email" required defaultValue={student.email}/></label><label>How can we help?<select defaultValue="Portal question"><option>Portal question</option><option>Course information</option><option>Technical support</option><option>Something else</option></select></label><label>Your message<textarea required rows="4" placeholder="Tell us a little about what you need..."/></label><button className="button button-primary" type="submit">{sent?'Message received ✓':'Send message'} {!sent&&<ArrowRight size={15}/>}</button>{sent&&<span className="form-success">Demo only: your message was not sent.</span>}</form></div></>}
+function Home() {
+  return (
+    <>
+      <section className="welcome">
+        <p className="tag">STUDENT PORTAL</p>
+        <h1>Welcome to Student Corner</h1>
+        <p>View your courses and grades for this semester.</p>
+        <Link className="button" to="/courses">View courses</Link>
+      </section>
+
+      <section className="content">
+        <div className="section-heading">
+          <h2>My courses</h2>
+          <Link to="/courses">All courses</Link>
+        </div>
+        <div className="cards">
+          {courses.slice(0, 3).map((course) => (
+            <article className="card" key={course.id}>
+              <span className="course-id">{course.id}</span>
+              <h3>{course.title}</h3>
+              <p className="instructor">Instructor: {course.instructor}</p>
+              <Link to={`/courses/${encodeURIComponent(course.id)}`}>
+                View course details
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+function About() {
+  return (
+    <section className="content narrow">
+      <p className="tag">ABOUT</p>
+      <h1>About this project</h1>
+      <p>
+        Student Corner is a small student portal made for a university web
+        programming project. It gives students a simple way to view course
+        information.
+      </p>
+      <p>
+        The website is built with React. The student and course details are
+        example data and are not connected to a real university system.
+      </p>
+    </section>
+  );
+}
+
+function Features() {
+  return (
+    <section className="content narrow">
+      <p className="tag">FEATURES</p>
+      <h1>Features</h1>
+      <ul className="feature-list">
+        <li>View the current course list.</li>
+        <li>Open a course to see its instructor, credits, and grade.</li>
+        <li>View a sample student profile.</li>
+        <li>Try the contact form.</li>
+      </ul>
+      <h2>Student profile</h2>
+      <div className="card profile">
+        <p><b>Name:</b> {student.name}</p>
+        <p><b>Major:</b> {student.major}</p>
+        <p><b>Year:</b> {student.year}</p>
+      </div>
+    </section>
+  );
+}
+
+function Courses() {
+  return (
+    <section className="content">
+      <p className="tag">COURSES</p>
+      <h1>My courses</h1>
+      <p className="muted">Sample courses for the current semester.</p>
+      <div className="cards">
+        {courses.map((course) => (
+          <article className="card" key={course.id}>
+            <span className="course-id">{course.id}</span>
+            <h2>{course.title}</h2>
+            <p>{course.instructor}</p>
+            <p>Grade: <b>{course.grade}</b></p>
+            <Link to={`/courses/${encodeURIComponent(course.id)}`}>
+              See details
+            </Link>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CourseDetails() {
+  const { courseId } = useParams();
+  const course = courses.find((item) => item.id === courseId);
+
+  if (!course) {
+    return (
+      <section className="content narrow">
+        <h1>Course not found</h1>
+        <Link to="/courses">Back to courses</Link>
+      </section>
+    );
+  }
+
+  return (
+    <section className="content narrow">
+      <p className="tag">COURSE DETAILS</p>
+      <h1>{course.title}</h1>
+      <div className="card">
+        <p><b>Course code:</b> {course.id}</p>
+        <p><b>Instructor:</b> {course.instructor}</p>
+        <p><b>Credits:</b> {course.credits}</p>
+        <p><b>Grade:</b> {course.grade}</p>
+      </div>
+      <p><Link to="/courses">Back to courses</Link></p>
+    </section>
+  );
+}
+
+function Contact() {
+  const [sent, setSent] = useState(false);
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    setSent(true);
+  }
+
+  return (
+    <section className="content narrow">
+      <p className="tag">CONTACT</p>
+      <h1>Contact us</h1>
+      <p>Leave a message using the form below.</p>
+      <form className="form" onSubmit={handleSubmit}>
+        <label>
+          Name
+          <input required placeholder="Your name" />
+        </label>
+        <label>
+          Email
+          <input required type="email" placeholder="you@example.com" />
+        </label>
+        <label>
+          Message
+          <textarea required rows="5" placeholder="Write your message" />
+        </label>
+        <button className="button" type="submit">Send message</button>
+        {sent && <p className="success">Message saved for this demo. No email was sent.</p>}
+      </form>
+    </section>
+  );
+}
 
 export default App;
