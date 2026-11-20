@@ -33,10 +33,6 @@ To create a deployable version, run `npm run build`. The output is saved in `dis
 
 Add screenshots of your final version here before submitting. Capture the home page at desktop width, the course list, one course details page, and the home page at phone width.
 
-## Project report
-
-See [Student Corner Project Report](output/pdf/Student_Corner_Project_Report.pdf). Fill in the student and group details and complete the contribution statement before submission.
-
 ## Before submitting
 
 - Change the sample student and course information in `src/data.js`.
