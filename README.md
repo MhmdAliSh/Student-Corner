@@ -31,12 +31,18 @@ To create a deployable version, run `npm run build`. The output is saved in `dis
 
 ## Screenshots
 
-Add screenshots of your final version here before submitting. Capture the home page at desktop width, the course list, one course details page, and the home page at phone width.
+### Home page
 
-## Before submitting
+![Student Corner home page on desktop](docs/screenshots/home-desktop.png)
 
-- Change the sample student and course information in `src/data.js`.
-- Add screenshots of your finished website.
-- Add your GitHub repository and deployment links to your report.
-- This is an individual project, so no group contribution statement is needed.
-- Check your instructor's policy on AI assistance and disclose assistance if required.
+### Course list
+
+![Student Corner course list](docs/screenshots/courses.png)
+
+### Course details
+
+![Advanced Web Programming course details](docs/screenshots/course-details.png)
+
+### Home page at a narrow width
+
+![Student Corner home page at a narrow browser width](docs/screenshots/home-narrow.png)
