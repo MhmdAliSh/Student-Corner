@@ -4,3 +4,7 @@ tmp/
 .DS_Store
 .env*
 !.env.example
+/Project_Report_Campusly.pdf
+/scripts/create_report.py
+/docs/screenshots/dashboard-desktop.png
+/docs/screenshots/dashboard-mobile.png
